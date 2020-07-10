@@ -39,8 +39,7 @@ class Dog
   end
 
   def self.create(name:, breed:)
-    dog = Dog.new(name, breed)
-    #attributes.each {|key, value| dog.send(("#{key}="), value)}
+    dog = Dog.new(name: name, breed: breed)
     dog.save
     dog
   end
@@ -49,21 +48,21 @@ class Dog
     id = row[0]
     name = row[1]
     breed = row[2]
-    self.new(id, name, breed)
+    self.new(id: id, name: name, breed: breed)
   end
 
 
   def self.find_by_id(id)
     sql = "SELECT * FROM dogs WHERE id = ?"
     result = DB[:conn].execute(sql, id)[0]
-    Dog.new(result[0], result[1], result[2])
+    Dog.new(id: result[0], name: result[1], breed: result[2])
   end
 
   def self.find_or_create_by(name:, breed:)
-    dog = DB[:conn].execute("SELECT * FROM dogs WHERE name = ? AND breed = ?", name, breed)
+    dog = DB[:conn].execute("SELECT * FROM dogs WHERE name = ? AND breed = ? LIMIT = 1", name, breed)
     if !dog.empty?
       dog_data = dog[0]
-      dog = Dog.new(dog_data[0], dog_data[1], dog_data[2])
+      dog = Dog.new(id: dog_data[0], name: dog_data[1], breed: dog_data[2])
     else
       dog = self.create(name: name, breed: breed)
     end
